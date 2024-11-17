@@ -22,7 +22,5 @@ yarn-error.log
 /.zed
 **/mysql.sock
 .docker/db_data/mysql.sock
-.docker/
 db_data/
-.docker
 .composer.lock
