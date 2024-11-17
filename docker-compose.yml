@@ -1,0 +1,46 @@
+services:
+  api-to-do-list:
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/Dockerfile
+    volumes:
+      - ./:/app
+    networks:
+      - laravel
+    depends_on:
+      - db-to-do-list
+
+  nginx:
+    build:
+      context: .
+      dockerfile: .docker/nginx/Dockerfile
+    volumes:
+      - ./:/app
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ports:
+      - "9000:80"
+    depends_on:
+      - api-to-do-list
+    networks:
+      - laravel
+
+  db-to-do-list:
+    image: mysql
+    volumes:
+      - .docker/mysql/databases:/var/lib/mysql
+      - .docker/mysql/sql-files:/sql-files
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    working_dir: /sql-files
+    ports:
+      - "3306:3306"
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
